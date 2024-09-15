@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch Widget</title>
+    <style>
+        /* Importing the Roboto font used for title and stopwatch */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        /* Main container appearance */
+        #widget-container {
+            border: 5px solid var(--border-color);
+            background-color: var(--bg-light-color);
+            padding: 10px;
+            border-radius: 15px;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Reset button properties, set to invisible and using an SVG icon as appearance */
+        .reset-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            border-width: 0;
+            background-color: transparent;
+            font-size: 0px;
+        }
+
+        /* Properties for the reset button SVG icon */
+        .reset-icon {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Make the icon clickable and change the color to a darker shade when hovering it */
+        .reset-icon:hover {
+            fill: var(--border-color);
+            cursor: pointer;
+        }
+
+        /* Stopwatch text size */
+        .stopwatch {
+            position: relative;
+            font-size: 3.5em;
+            cursor: pointer;
+            user-select: none;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        /* Appearance for the widget title */
+        .title {
+            position: relative;
+            font-family: Roboto;
+            font-weight: 900;
+            font-style: italic;
+            font-size: 1.5em;
+            color: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Main container for the widget -->
+    <div id="widget-container">
+        <!-- Widget title -->
+        <div>
+            <h2 class="title" id="widget-title">My Stopwatch</h2>
+        </div>
+
+        <!-- Stopwatch -->
+        <div style="display: flex; justify-content: center;">
+            <svg>
+                <text text-anchor="middle" x="50%" y="50%" class="stopwatch" id="stopwatch" fill="white" stroke-width="8" letter-spacing="3" paint-order="stroke" style="stroke: var(--border-color);">00:00:00</text>
+            </svg>
+        </div>
+
+        <!-- Reset button -->
+        <button class="reset-btn" id="reset-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="reset-icon" viewBox="0 0 20 20" fill="var(--border-color)">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Stopwatch Variables
+        let stopwatchId = new URLSearchParams(window.location.search).get('id') || 'default';
+        let stopwatchTime = localStorage.getItem(`stopwatch_${stopwatchId}`) || 0;
+        let timerInterval = null;
+        let running = false;
+
+        // Update Stopwatch Display
+        function updateStopwatch() {
+            const hours = String(Math.floor(stopwatchTime / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((stopwatchTime % 3600) / 60)).padStart(2, '0');
+            const seconds = String(stopwatchTime % 60).padStart(2, '0');
+            document.getElementById('stopwatch').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Toggle Start/Pause by clicking the stopwatch
+        document.getElementById('stopwatch').addEventListener('click', () => {
+            if (running) {
+                pauseStopwatch();
+            } else {
+                startStopwatch();
+            }
+        });
+
+        // Start Stopwatch
+        function startStopwatch() {
+            timerInterval = setInterval(() => {
+                stopwatchTime++;
+                updateStopwatch();
+                localStorage.setItem(`stopwatch_${stopwatchId}`, stopwatchTime);
+            }, 1000);
+            running = true;
+        }
+
+        // Pause Stopwatch
+        function pauseStopwatch() {
+            clearInterval(timerInterval);
+            running = false;
+        }
+
+        // Reset Stopwatch
+        document.getElementById('reset-btn').addEventListener('click', function(event) {
+            event.stopPropagation();
+            clearInterval(timerInterval);
+            stopwatchTime = 0;
+            updateStopwatch();
+            localStorage.removeItem(`stopwatch_${stopwatchId}`);
+            running = false;
+        });
+
+        // Initialize Stopwatch
+        updateStopwatch();
+
+        // Custom Colors from URL Params
+        const urlParams = new URLSearchParams(window.location.search);
+        const textColor = urlParams.get('color') || 'black';
+        const bgColor = urlParams.get('bgColor') || '#E8E9EC';
+        const borderColor = urlParams.get('borderColor') || '#6F6F77';
+        const title = urlParams.get('title') || 'My Stopwatch';
+
+        document.documentElement.style.setProperty('--text-color', textColor);
+        document.documentElement.style.setProperty('--bg-light-color', bgColor);
+        document.documentElement.style.setProperty('--border-color', borderColor);
+
+        document.getElementById('widget-title').textContent = title;
+    </script>
+</body>
+</html>
