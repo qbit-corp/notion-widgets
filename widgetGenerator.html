@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch Widget Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .form-container, .preview-container {
+            width: 48%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        .url-output {
+            background: #f0f0f0;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Stopwatch Widget Generator</h1>
+
+<div class="container">
+    <!-- Form container -->
+    <div class="form-container">
+        <label for="title">Widget Title</label>
+        <input type="text" id="title" placeholder="Enter widget title" value="My Stopwatch">
+
+        <label for="id">Widget ID (auto-generated)</label>
+        <input type="text" id="id" placeholder="Enter unique widget ID">
+
+        <label for="color">Text Color</label>
+        <input type="color" id="color" value="#000000">
+
+        <label for="bgColor">Background Color</label>
+        <input type="color" id="bgColor" value="#FFFFFF">
+
+        <label for="borderColor">Border Color</label>
+        <input type="color" id="borderColor" value="#CCCCCC">
+
+        <div class="url-output" id="generatedUrl">Your widget URL will appear here...</div>
+    </div>
+
+    <!-- Preview container -->
+    <div class="preview-container">
+        <h3>Widget Preview</h3>
+        <iframe id="widgetPreview" src=""></iframe>
+    </div>
+</div>
+
+<script>
+    const titleInput = document.getElementById('title');
+    const idInput = document.getElementById('id');
+    const colorInput = document.getElementById('color');
+    const bgColorInput = document.getElementById('bgColor');
+    const borderColorInput = document.getElementById('borderColor');
+    const generatedUrl = document.getElementById('generatedUrl');
+    const widgetPreview = document.getElementById('widgetPreview');
+
+    const BASE_URL = 'https://qbit-corp.github.io/notion-widgets/stopwatch.html';
+
+    // Function to generate a 6-digit random alphanumeric string
+    function generateRandomID() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+
+    // Automatically set a random ID when the page loads
+    document.getElementById('id').value = generateRandomID();
+
+    // Generate the widget URL dynamically
+    function generateWidgetURL() {
+        const title = encodeURIComponent(titleInput.value);
+        const id = encodeURIComponent(idInput.value);
+        const color = encodeURIComponent(colorInput.value);
+        const bgColor = encodeURIComponent(bgColorInput.value);
+        const borderColor = encodeURIComponent(borderColorInput.value);
+
+        const widgetURL = `${BASE_URL}?id=${id}&color=${color}&bgColor=${bgColor}&borderColor=${borderColor}&title=${title}`;
+        generatedUrl.textContent = widgetURL;
+        widgetPreview.src = widgetURL;
+    }
+
+    // Update the preview dynamically as the user changes inputs
+    titleInput.addEventListener('input', generateWidgetURL);
+    idInput.addEventListener('input', generateWidgetURL);
+    colorInput.addEventListener('input', generateWidgetURL);
+    bgColorInput.addEventListener('input', generateWidgetURL);
+    borderColorInput.addEventListener('input', generateWidgetURL);
+
+    // Initialize preview with default values on load
+    generateWidgetURL();
+</script>
+
+</body>
+</html>
